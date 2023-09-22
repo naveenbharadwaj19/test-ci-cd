@@ -1,0 +1,63 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - main-sandbox
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v11
+        with:
+          flutter-version: '3.10.0' # Adjust the Flutter version as needed
+
+      - name: Build and Deploy
+        run: |
+          if [[ ${{ github.ref }} == "refs/heads/main" ]]; then
+            dart run build_runner build --delete-conflicting-outputs
+            flutter build web
+          elif [[ ${{ github.ref }} == "refs/heads/main-sandbox" ]]; then
+            dart run build_runner build --delete-conflicting-outputs
+            flutter build web --profile
+          fi
+
+      - name: Check for Build Errors
+        id: build-status
+        run: |
+          if [[ ${{ github.ref }} == "refs/heads/main" ]]; then
+            if [ -d "build/web" ]; then
+              echo "Build succeeded."
+            else
+              echo "Build failed. Trying to recover..."
+              flutter clean
+              dart run build_runner build --delete-conflicting-outputs
+              flutter build web
+            fi
+          elif [[ ${{ github.ref }} == "refs/heads/main-sandbox" ]]; then
+            if [ -d "build/web" ]; then
+              echo "Build succeeded (sandbox)."
+            else
+              echo "Build failed (sandbox). Trying to recover..."
+              flutter clean
+              dart run build_runner build --delete-conflicting-outputs
+              flutter build web --profile
+            fi
+          fi
+
+      # - name: Deploy to AWS EC2
+      #   if: steps.build-status.outcome == 'success' # Only deploy if the build is successful
+      #   run: |
+      #     # Add commands to upload the build package to AWS EC2 here
+
+      # - name: Send Notification
+      #   if: steps.build-status.outcome == 'success' # Only send notification if the build is successful
+      #   run: |
+      #     # Add commands to send a notification to a particular email here
