@@ -76,7 +76,7 @@ jobs:
             rm -rf web/web
 
             # Recreate the "web" folder
-            mkdir web
+            mkdir -p web/web
 
             # Deploy the entire artifact into the "web" folder
-            mv $RUNNER_WORKSPACE/web-artifact/* web/
+            mv $RUNNER_WORKSPACE/web-artifact/* web/web/
