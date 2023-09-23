@@ -66,7 +66,7 @@ jobs:
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
           TARGET: /home/ubuntu/
           SSH_PRIVATE_KEY: ${{ secrets.EC2_PEM_KEY }}
-          SCRIPT_AFTER: |
+          SCRIPT_BEFORE: |
             echo "Running script..."
             # cd /home/ubuntu/web
             # echo "Deleting web/ folder"
@@ -75,10 +75,10 @@ jobs:
             # echo "Created web/"
 
             # Ensure that $GITHUB_WORKSPACE exists
-            if [ -d "$RSYNC_STDOUT" ]; then
-              echo "Copying contents from $RSYNC_STDOUT to /home/ubuntu/web/web..."
+            if [ -d "$GITHUB_WORKSPACE/build/web" ]; then
+              echo "Copying contents from $GITHUB_WORKSPACE/build/web to /home/ubuntu/web/web..."
               ls
-              # cp -r $RSYNC_STDOUT/build/web /home/ubuntu/web/web/
+              # cp -r $GITHUB_WORKSPACE/build/web/build/web /home/ubuntu/web/web/
             else
-              echo "The $RSYNC_STDOUT directory does not exist. Nothing to copy."
+              echo "The $GITHUB_WORKSPACE/build/web directory does not exist. Nothing to copy."
             fi
