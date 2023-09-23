@@ -76,10 +76,6 @@ jobs:
 
             # Deploy the "web" folder from the artifact (not the whole 'build/web' directory)
             cp -r $RUNNER_WORKSPACE/web-artifact/* web/
-          EOF
-
-          # Clean up the local key file
-          rm ec2.pem
 
       # - name: Send Notification
       #   if: steps.build-status.outcome == 'success' # Only send notification if the build is successful
