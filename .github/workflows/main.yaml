@@ -66,8 +66,9 @@ jobs:
         with:
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
+          TARGET: /home/ubuntu/
           SSH_PRIVATE_KEY: ${{ secrets.EC2_PEM_KEY }}
-          run: |
+          SCRIPT_AFTER: |
             echo "Running script..."
 
             cd /home/ubuntu/web
