@@ -53,11 +53,6 @@ jobs:
             fi
           fi
 
-      - name: List Workspace Contents
-        run: |
-          ls -R $RUNNER_WORKSPACE
-        continue-on-error: true
-
       - name: Archive Build Artifacts
         if: steps.build-status.outcome == 'success'
         uses: actions/upload-artifact@v3
