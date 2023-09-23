@@ -15,50 +15,50 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: "3.10.0" # Adjust the Flutter version as needed
+      # - name: Set up Flutter
+      #   uses: subosito/flutter-action@v2
+      #   with:
+      #     flutter-version: "3.10.0" # Adjust the Flutter version as needed
 
-      - name: Build and Deploy
-        run: |
-          if [[ ${{ github.ref }} == "refs/heads/main" ]]; then
-            dart run build_runner build --delete-conflicting-outputs
-            flutter build web
-          elif [[ ${{ github.ref }} == "refs/heads/main-sandbox" ]]; then
-            dart run build_runner build --delete-conflicting-outputs
-            flutter build web --profile
-          fi
+      # - name: Build and Deploy
+      #   run: |
+      #     if [[ ${{ github.ref }} == "refs/heads/main" ]]; then
+      #       dart run build_runner build --delete-conflicting-outputs
+      #       flutter build web
+      #     elif [[ ${{ github.ref }} == "refs/heads/main-sandbox" ]]; then
+      #       dart run build_runner build --delete-conflicting-outputs
+      #       flutter build web --profile
+      #     fi
 
-      - name: Check for Build Errors
-        id: build-status
-        run: |
-          if [[ ${{ github.ref }} == "refs/heads/main" ]]; then
-            if [ -d "build/web" ]; then
-              echo "Build succeeded."
-            else
-              echo "Build failed. Trying to recover..."
-              flutter clean
-              dart run build_runner build --delete-conflicting-outputs
-              flutter build web
-            fi
-          elif [[ ${{ github.ref }} == "refs/heads/main-sandbox" ]]; then
-            if [ -d "build/web" ]; then
-              echo "Build succeeded (sandbox)."
-            else
-              echo "Build failed (sandbox). Trying to recover..."
-              flutter clean
-              dart run build_runner build --delete-conflicting-outputs
-              flutter build web --profile
-            fi
-          fi
+      # - name: Check for Build Errors
+      #   id: build-status
+      #   run: |
+      #     if [[ ${{ github.ref }} == "refs/heads/main" ]]; then
+      #       if [ -d "build/web" ]; then
+      #         echo "Build succeeded."
+      #       else
+      #         echo "Build failed. Trying to recover..."
+      #         flutter clean
+      #         dart run build_runner build --delete-conflicting-outputs
+      #         flutter build web
+      #       fi
+      #     elif [[ ${{ github.ref }} == "refs/heads/main-sandbox" ]]; then
+      #       if [ -d "build/web" ]; then
+      #         echo "Build succeeded (sandbox)."
+      #       else
+      #         echo "Build failed (sandbox). Trying to recover..."
+      #         flutter clean
+      #         dart run build_runner build --delete-conflicting-outputs
+      #         flutter build web --profile
+      #       fi
+      #     fi
 
-      - name: Archive Build Artifacts
-        if: steps.build-status.outcome == 'success'
-        uses: actions/upload-artifact@v3
-        with:
-          name: web-artifact
-          path: build/web
+      # - name: Archive Build Artifacts
+      #   if: steps.build-status.outcome == 'success'
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: web-artifact
+      #     path: build/web
 
       - name: Deploy to AWS EC2
         if: steps.build-status.outcome == 'success'
@@ -70,11 +70,11 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.EC2_PEM_KEY }}
           SCRIPT_AFTER: |
             # Navigate to the target directory
-            mkdir -p /home/ubuntu/web/web
+            cd /home/ubuntu/web
 
             # create dir a folder
             mkdir demo
 
-            cd /home/ubuntu/web/web/demo
+            cd /home/ubuntu/web/demo
 
             touch abc.txt
