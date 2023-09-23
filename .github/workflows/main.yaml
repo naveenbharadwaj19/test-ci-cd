@@ -70,13 +70,13 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.EC2_PEM_KEY }}
           SCRIPT_AFTER: |
             # Navigate to the target directory
-            cd /home/ubuntu
+            cd /home/ubuntu/web
 
             # Delete the existing "web" folder
-            rm -rf web/web
+            rm -rf web
 
             # Recreate the "web" folder
-            mkdir -p web/web
+            mkdir -p web
 
             # Deploy the contents of "build/web" to "web/web"
             cp -r $GITHUB_WORKSPACE/build/web/* /home/ubuntu/web/web/
