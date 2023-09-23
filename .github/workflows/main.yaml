@@ -69,12 +69,26 @@ jobs:
           REMOTE_PATH: /home/ubuntu/
           SSH_PRIVATE_KEY: ${{ secrets.EC2_PEM_KEY }}
           SCRIPT_AFTER: |
+            # Start debugging
+            echo "Running script after deployment..."
+
             # Navigate to the target directory
             cd /home/ubuntu/web
 
-            # create dir a folder
+            # Print the current working directory
+            pwd
+
+            # Create a directory
             mkdir demo
 
-            cd /home/ubuntu/web/demo
+            # Move into the new directory
+            cd demo
 
+            # Create a text file
             touch abc.txt
+
+            # List the contents of the directory
+            ls -la
+
+            # End debugging
+            echo "Script after deployment completed."
