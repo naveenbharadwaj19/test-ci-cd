@@ -12,7 +12,7 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4 # Change to v4
+        uses: actions/checkout@v4
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -54,15 +54,31 @@ jobs:
 
       - name: Archive Build Artifacts
         if: steps.build-status.outcome == 'success'
-        uses: actions/upload-artifact@v3 # Change to v4
+        uses: actions/upload-artifact@v3
         with:
           name: web-artifact
           path: build/web
 
-      # - name: Deploy to AWS EC2
-      #   if: steps.build-status.outcome == 'success' # Only deploy if the build is successful
-      #   run: |
-      #     # Add commands to upload the build package to AWS EC2 here
+      - name: Deploy to AWS EC2
+        if: steps.build-status.outcome == 'success'
+        run: |
+          echo "${{ secrets.EC2_PEM_KEY }}" > ec2.pem
+          chmod 600 ec2.pem
+
+          # SSH into the EC2 instance
+          ssh -i ec2.pem ubuntu@65.0.87.46 <<EOF
+            # Navigate to the target directory
+            cd /home/ubuntu/web
+
+            # Delete the existing "web" folder
+            rm -rf web
+
+            # Deploy the "web" folder from the artifact
+            cp -r $RUNNER_WORKSPACE/web-artifact web
+          EOF
+
+          # Clean up the local key file
+          rm ec2.pem
 
       # - name: Send Notification
       #   if: steps.build-status.outcome == 'success' # Only send notification if the build is successful
