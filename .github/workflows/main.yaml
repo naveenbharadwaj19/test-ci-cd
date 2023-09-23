@@ -9,7 +9,7 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 8 #max time 
+    timeout-minutes: 8 #max time
 
     steps:
       - name: Checkout Code
@@ -79,4 +79,4 @@ jobs:
             mkdir -p web/web
 
             # Deploy the entire artifact into the "web" folder
-            mv $RUNNER_WORKSPACE/web-artifact/* web/web/
+            mv $RUNNER_WORKSPACE/web-artifact/* /home/ubuntu/web/web/
