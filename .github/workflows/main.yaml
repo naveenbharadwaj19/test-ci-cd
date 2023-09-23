@@ -80,9 +80,10 @@ jobs:
 
             echo "Created web/"
 
-            if [ -d "$RUNNER_WORKSPACE/build/web" ]; then
-              echo "Copying contents from $RUNNER_WORKSPACE/build/web to /home/ubuntu/web/web..."
-              cp -r $RUNNER_WORKSPACE/build/web/* /home/ubuntu/web/web/
+            # Ensure that $GITHUB_WORKSPACE exists
+            if [ -d "$GITHUB_WORKSPACE" ]; then
+              echo "Copying contents from $GITHUB_WORKSPACE to /home/ubuntu/web/web..."
+              cp -r $GITHUB_WORKSPACE/* /home/ubuntu/web/web/
             else
-              echo "Build artifacts in $RUNNER_WORKSPACE/build/web do not exist. Nothing to copy."
+              echo "The $GITHUB_WORKSPACE directory does not exist. Nothing to copy."
             fi
