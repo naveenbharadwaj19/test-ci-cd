@@ -29,7 +29,6 @@ jobs:
             dart run build_runner build --delete-conflicting-outputs
             flutter build web --profile
           fi
-
       - name: Check for Build Errors
         id: build-status
         run: |
@@ -52,7 +51,6 @@ jobs:
               flutter build web --profile
             fi
           fi
-
       - name: Archive Build Artifacts
         if: steps.build-status.outcome == 'success'
         uses: actions/upload-artifact@v3
@@ -66,23 +64,19 @@ jobs:
         with:
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
+          TARGET: /home/ubuntu/
           SSH_PRIVATE_KEY: ${{ secrets.EC2_PEM_KEY }}
           SCRIPT_AFTER: |
             echo "Running script..."
-
             cd /home/ubuntu/web
-
             echo "Deleting web/ folder"
             rm -rf web
-
             mkdir web
-
             echo "Created web/"
-
             # Ensure that $GITHUB_WORKSPACE exists
-            if [ -d "$GITHUB_WORKSPACE" ]; then
+            if [ -d "/$GITHUB_WORKSPACE" ]; then
               echo "Copying contents from $GITHUB_WORKSPACE to /home/ubuntu/web/web..."
-              cp -r $GITHUB_WORKSPACE/* /home/ubuntu/web/web/
+              cp -r /$GITHUB_WORKSPACE/* /home/ubuntu/web/web/
             else
-              echo "The $GITHUB_WORKSPACE directory does not exist. Nothing to copy."
+              echo "The /$GITHUB_WORKSPACE directory does not exist. Nothing to copy."
             fi
