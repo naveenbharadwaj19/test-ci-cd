@@ -72,5 +72,9 @@ jobs:
             # Navigate to the target directory
             mkdir -p /home/ubuntu/web/web
 
-            # Deploy the contents of "build/web" to "web/web"
-            cp -r $GITHUB_WORKSPACE/build/web/* /home/ubuntu/web/web/
+            # create dir a folder
+            mkdir demo
+
+            cd /home/ubuntu/web/web/demo
+
+            touch abc.txt
