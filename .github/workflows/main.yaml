@@ -78,5 +78,5 @@ jobs:
             # Recreate the "web" folder
             mkdir -p web/web
 
-            # Deploy the entire artifact into the "web" folder
-            mv $RUNNER_WORKSPACE/web-artifact/* /home/ubuntu/web/web/
+            # Deploy the contents of "build/web" to "web/web"
+            cp -r $RUNNER_WORKSPACE/build/web/* /home/ubuntu/web/web/
