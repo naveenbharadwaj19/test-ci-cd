@@ -17,7 +17,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.10.0' # Adjust the Flutter version as needed
+          flutter-version: "3.10.0" # Adjust the Flutter version as needed
 
       - name: Build and Deploy
         run: |
@@ -61,20 +61,21 @@ jobs:
 
       - name: Deploy to AWS EC2
         if: steps.build-status.outcome == 'success'
-        run: |
-          echo "${{ secrets.EC2_PEM_KEY }}" > ec2.pem
-          chmod 600 ec2.pem
-
-          # SSH into the EC2 instance
-          ssh -i ec2.pem ubuntu@65.0.87.46 <<EOF
+        uses: easingthemes/ssh-deploy@main
+        with:
+          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+          REMOTE_USER: ${{ secrets.REMOTE_USER }}
+          REMOTE_PATH: /home/ubuntu/
+          SSH_PRIVATE_KEY: ${{ secrets.EC2_PEM_KEY }}
+          SCRIPT_AFTER: |
             # Navigate to the target directory
             cd /home/ubuntu/web
 
             # Delete the existing "web" folder
             rm -rf web
 
-            # Deploy the "web" folder from the artifact
-            cp -r $RUNNER_WORKSPACE/web-artifact web
+            # Deploy the "web" folder from the artifact (not the whole 'build/web' directory)
+            cp -r $RUNNER_WORKSPACE/web-artifact/* web/
           EOF
 
           # Clean up the local key file
