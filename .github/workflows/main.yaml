@@ -64,9 +64,9 @@ jobs:
         with:
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
-          TARGET: /home/ubuntu/
+          TARGET: /home/ubuntu/store-ci-cd
           SSH_PRIVATE_KEY: ${{ secrets.EC2_PEM_KEY }}
-          SCRIPT_BEFORE: |
+          SCRIPT_AFTER: |
             echo "Running script..."
             # cd /home/ubuntu/web
             # echo "Deleting web/ folder"
@@ -75,10 +75,11 @@ jobs:
             # echo "Created web/"
 
             # Ensure that $GITHUB_WORKSPACE exists
-            if [ -d "$GITHUB_WORKSPACE/build/web" ]; then
-              echo "Copying contents from $GITHUB_WORKSPACE/build/web to /home/ubuntu/web/web..."
+            echo "checking..."
+            if [ -d "/home/ubuntu/store-ci-cd/build/web" ]; then
+              echo "yessss"
               ls
               # cp -r $GITHUB_WORKSPACE/build/web/build/web /home/ubuntu/web/web/
             else
-              echo "The $GITHUB_WORKSPACE/build/web directory does not exist. Nothing to copy."
+              echo "The directory does not exist. Nothing to copy."
             fi
