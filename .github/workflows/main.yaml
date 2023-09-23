@@ -68,16 +68,17 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.EC2_PEM_KEY }}
           SCRIPT_AFTER: |
             echo "Running script..."
-            cd /home/ubuntu/web
-            echo "Deleting web/ folder"
-            rm -rf web
-            mkdir web
-            echo "Created web/"
+            # cd /home/ubuntu/web
+            # echo "Deleting web/ folder"
+            # rm -rf web
+            # mkdir web
+            # echo "Created web/"
+
             # Ensure that $GITHUB_WORKSPACE exists
             if [ -d "$RSYNC_STDOUT" ]; then
-              echo "Copying contents from $GITHUB_WORKSPACE to /home/ubuntu/web/web..."
+              echo "Copying contents from $RSYNC_STDOUT to /home/ubuntu/web/web..."
               ls
-              # cp -r $GITHUB_WORKSPACE/* /home/ubuntu/web/web/
+              # cp -r $RSYNC_STDOUT/build/web /home/ubuntu/web/web/
             else
-              echo "The $GITHUB_WORKSPACE directory does not exist. Nothing to copy."
+              echo "The $RSYNC_STDOUT directory does not exist. Nothing to copy."
             fi
