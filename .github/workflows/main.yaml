@@ -9,59 +9,59 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 8 #max time
+    timeout-minutes: 8 # Maximum execution time
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # - name: Set up Flutter
-      #   uses: subosito/flutter-action@v2
-      #   with:
-      #     flutter-version: "3.10.0" # Adjust the Flutter version as needed
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.10.0" # Adjust the Flutter version as needed
 
-      # - name: Build and Deploy
-      #   run: |
-      #     if [[ ${{ github.ref }} == "refs/heads/main" ]]; then
-      #       dart run build_runner build --delete-conflicting-outputs
-      #       flutter build web
-      #     elif [[ ${{ github.ref }} == "refs/heads/main-sandbox" ]]; then
-      #       dart run build_runner build --delete-conflicting-outputs
-      #       flutter build web --profile
-      #     fi
+      - name: Build and Deploy
+        run: |
+          if [[ ${{ github.ref }} == "refs/heads/main" ]]; then
+            dart run build_runner build --delete-conflicting-outputs
+            flutter build web
+          elif [[ ${{ github.ref }} == "refs/heads/main-sandbox" ]]; then
+            dart run build_runner build --delete-conflicting-outputs
+            flutter build web --profile
+          fi
 
-      # - name: Check for Build Errors
-      #   id: build-status
-      #   run: |
-      #     if [[ ${{ github.ref }} == "refs/heads/main" ]]; then
-      #       if [ -d "build/web" ]; then
-      #         echo "Build succeeded."
-      #       else
-      #         echo "Build failed. Trying to recover..."
-      #         flutter clean
-      #         dart run build_runner build --delete-conflicting-outputs
-      #         flutter build web
-      #       fi
-      #     elif [[ ${{ github.ref }} == "refs/heads/main-sandbox" ]]; then
-      #       if [ -d "build/web" ]; then
-      #         echo "Build succeeded (sandbox)."
-      #       else
-      #         echo "Build failed (sandbox). Trying to recover..."
-      #         flutter clean
-      #         dart run build_runner build --delete-conflicting-outputs
-      #         flutter build web --profile
-      #       fi
-      #     fi
+      - name: Check for Build Errors
+        id: build-status
+        run: |
+          if [[ ${{ github.ref }} == "refs/heads/main" ]]; then
+            if [ -d "build/web" ]; then
+              echo "Build succeeded."
+            else
+              echo "Build failed. Trying to recover..."
+              flutter clean
+              dart run build_runner build --delete-conflicting-outputs
+              flutter build web
+            fi
+          elif [[ ${{ github.ref }} == "refs/heads/main-sandbox" ]]; then
+            if [ -d "build/web" ]; then
+              echo "Build succeeded (sandbox)."
+            else
+              echo "Build failed (sandbox). Trying to recover..."
+              flutter clean
+              dart run build_runner build --delete-conflicting-outputs
+              flutter build web --profile
+            fi
+          fi
 
-      # - name: Archive Build Artifacts
-      #   if: steps.build-status.outcome == 'success'
-      #   uses: actions/upload-artifact@v3
-      #   with:
-      #     name: web-artifact
-      #     path: build/web
+      - name: Archive Build Artifacts
+        if: steps.build-status.outcome == 'success'
+        uses: actions/upload-artifact@v3
+        with:
+          name: web-artifact
+          path: build/web
 
       - name: Deploy to AWS EC2
-        # if: steps.build-status.outcome == 'success'
+        if: steps.build-status.outcome == 'success'
         uses: easingthemes/ssh-deploy@main
         with:
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
@@ -69,26 +69,20 @@ jobs:
           REMOTE_PATH: /home/ubuntu/
           SSH_PRIVATE_KEY: ${{ secrets.EC2_PEM_KEY }}
           SCRIPT_AFTER: |
-            # Start debugging
-            echo "Running script after deployment..."
+            echo "Running script..."
 
-            # Navigate to the target directory
             cd /home/ubuntu/web
 
-            # Print the current working directory
-            pwd
+            echo "Deleting web/ folder"
+            rm -rf web
 
-            # Create a directory
-            mkdir demo
+            mkdir web
 
-            # Move into the new directory
-            cd demo
+            echo "Created web/"
 
-            # Create a text file
-            touch abc.txt
-
-            # List the contents of the directory
-            ls -la
-
-            # End debugging
-            echo "Script after deployment completed."
+            if [ -d "$GITHUB_WORKSPACE/build/web" ]; then
+              echo "Copying contents from $GITHUB_WORKSPACE/build/web to /home/ubuntu/web/web..."
+              cp -r $GITHUB_WORKSPACE/build/web/* /home/ubuntu/web/web/
+            else
+              echo "Build artifacts in $GITHUB_WORKSPACE/build/web do not exist. Nothing to copy."
+            fi
