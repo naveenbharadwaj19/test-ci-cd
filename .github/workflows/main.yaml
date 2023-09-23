@@ -79,4 +79,4 @@ jobs:
             mkdir -p web/web
 
             # Deploy the contents of "build/web" to "web/web"
-            cp -r $RUNNER_WORKSPACE/build/web/* /home/ubuntu/web/web/
+            cp -r $GITHUB_WORKSPACE/build/web/* /home/ubuntu/web/web/
