@@ -9,6 +9,7 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 8 #max time 
 
     steps:
       - name: Checkout Code
@@ -72,7 +73,7 @@ jobs:
             cd /home/ubuntu
 
             # Delete the existing "web" folder
-            rm -rf web
+            rm -rf web/web
 
             # Recreate the "web" folder
             mkdir web
