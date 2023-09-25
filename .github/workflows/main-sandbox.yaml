@@ -1,9 +1,9 @@
-name: CI/CD-Main
+name: CI/CD-Main-Sandbox
 
 on:
   push:
     branches:
-      - main
+      - main-sandbox
 
 jobs:
   build-and-deploy:
@@ -22,18 +22,18 @@ jobs:
       - name: Build and Deploy
         run: |
           dart run build_runner build --delete-conflicting-outputs
-          flutter build web
+          flutter build web --profile
 
       - name: Check for Build Errors
         id: build-status
         run: |
           if [ -d "build/web" ]; then
-            echo "Build succeeded."
+            echo "Build succeeded (sandbox)."
           else
-            echo "Build failed. Trying to recover..."
+            echo "Build failed (sandbox). Trying to recover..."
             flutter clean
             dart run build_runner build --delete-conflicting-outputs
-            flutter build web
+            flutter build web --profile
           fi
 
       - name: Archive Build Artifacts
@@ -50,7 +50,7 @@ jobs:
         with:
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
-          TARGET: ${{ secrets.TARGET }}/main/demo
+          TARGET: ${{ secrets.TARGET }}/sandbox/demo
           SOURCE: build/
           SSH_PRIVATE_KEY: ${{ secrets.EC2_PEM_KEY }}
           SCRIPT_AFTER: |
@@ -58,7 +58,7 @@ jobs:
 
             path="/home/ubuntu/web"
 
-            artifact_path="${{ secrets.TARGET }}/main/demo/web"
+            artifact_path="${{ secrets.TARGET }}/sandbox/demo/web"
 
             echo "Deleting web/ folder"
             rm -rf ${path}/web
