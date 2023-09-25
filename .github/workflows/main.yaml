@@ -76,7 +76,6 @@ jobs:
 
             echo "Deleting web/ folder"
             rm -rf ${path}/web
-            # mkdir ${path}/web
             # echo "created ${path}/web"
 
             # Ensure that $GITHUB_WORKSPACE exists
