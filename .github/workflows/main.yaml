@@ -1,10 +1,9 @@
-name: CI/CD
+name: CI/CD-Main
 
 on:
   push:
     branches:
       - main
-      - main-sandbox
 
 jobs:
   build-and-deploy:
@@ -22,35 +21,19 @@ jobs:
 
       - name: Build and Deploy
         run: |
-          if [[ ${{ github.ref }} == "refs/heads/main" ]]; then
-            dart run build_runner build --delete-conflicting-outputs
-            flutter build web
-          elif [[ ${{ github.ref }} == "refs/heads/main-sandbox" ]]; then
-            dart run build_runner build --delete-conflicting-outputs
-            flutter build web --profile
-          fi
+          dart run build_runner build --delete-conflicting-outputs
+          flutter build web
 
       - name: Check for Build Errors
         id: build-status
         run: |
-          if [[ ${{ github.ref }} == "refs/heads/main" ]]; then
-            if [ -d "build/web" ]; then
-              echo "Build succeeded."
-            else
-              echo "Build failed. Trying to recover..."
-              flutter clean
-              dart run build_runner build --delete-conflicting-outputs
-              flutter build web
-            fi
-          elif [[ ${{ github.ref }} == "refs/heads/main-sandbox" ]]; then
-            if [ -d "build/web" ]; then
-              echo "Build succeeded (sandbox)."
-            else
-              echo "Build failed (sandbox). Trying to recover..."
-              flutter clean
-              dart run build_runner build --delete-conflicting-outputs
-              flutter build web --profile
-            fi
+          if [ -d "build/web" ]; then
+            echo "Build succeeded."
+          else
+            echo "Build failed. Trying to recover..."
+            flutter clean
+            dart run build_runner build --delete-conflicting-outputs
+            flutter build web
           fi
 
       - name: Archive Build Artifacts
@@ -61,24 +44,13 @@ jobs:
           path: build/web
           retention-days: 15 # will be expired in 15 days
 
-      - name: Set Target Path
-        if: steps.build-status.outcome == 'success'
-        id: set-target
-        run: |
-          if [[ ${{ github.ref }} == "refs/heads/main" ]]; then
-            echo "::set-output name=target_path::$TARGET/main/demo"
-
-          else
-            echo "::set-output name=target_path::$TARGET/sandbox/demo"
-          fi
-
       - name: Deploy to EC2
         if: steps.build-status.outcome == 'success'
         uses: easingthemes/ssh-deploy@main
         with:
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
-          TARGET: ${{ steps.set-target.outputs.target_path }}
+          TARGET: ${{ secrets.TARGET }}/main/demo
           SOURCE: build/
           SSH_PRIVATE_KEY: ${{ secrets.EC2_PEM_KEY }}
           SCRIPT_AFTER: |
@@ -86,7 +58,7 @@ jobs:
 
             path="/home/ubuntu/web"
 
-            artifact_path="${{ steps.set-target.outputs.target_path }}/web"
+            artifact_path="${{ secrets.TARGET }}/main/demo/web"
 
             echo "Deleting web/ folder"
             rm -rf ${path}/web
