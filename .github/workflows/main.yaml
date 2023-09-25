@@ -74,11 +74,10 @@ jobs:
 
             artifact_path="/home/ubuntu/artifacts/demo"
 
-            cd ${path}
             echo "Deleting web/ folder"
-            rm -rf web
-            mkdir web
-            echo "Created web/"
+            rm -rf ${path}/web
+            mkdir ${path}/web
+            echo "${path}/web"
 
             # Ensure that $GITHUB_WORKSPACE exists
             echo "checking if artifact exists"
