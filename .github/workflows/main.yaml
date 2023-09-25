@@ -64,23 +64,27 @@ jobs:
         with:
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
-          TARGET: /home/ubuntu/store-ci-cd
+          TARGET: /home/ubuntu/artifacts
           SOURCE: build/
           SSH_PRIVATE_KEY: ${{ secrets.EC2_PEM_KEY }}
           SCRIPT_AFTER: |
             echo "Running script..."
-            # cd /home/ubuntu/web
-            # echo "Deleting web/ folder"
-            # rm -rf web
-            # mkdir web
-            # echo "Created web/"
+
+            path="/home/ubuntu/web"
+
+            artifact_path="/home/ubuntu/artifacts"
+
+            cd ${path}
+            echo "Deleting web/ folder"
+            rm -rf web
+            mkdir web
+            echo "Created web/"
 
             # Ensure that $GITHUB_WORKSPACE exists
-            echo "checking..."
-            if [ -d "/home/ubuntu/store-ci-cd/build/web" ]; then
-              echo "yessss"
-              ls
-              # cp -r $GITHUB_WORKSPACE/build/web/build/web /home/ubuntu/web/web/
+            echo "checking if artifact exists"
+            if [ -d "${artifact_path}" ]; then
+              echo "Artifact exists"
+              cp -r ${artifact_path} ${path}
             else
-              echo "The directory does not exist. Nothing to copy."
+              echo "Artifact does not exists.Nothing to copy"
             fi
