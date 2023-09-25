@@ -81,9 +81,9 @@ jobs:
 
             # Ensure that $GITHUB_WORKSPACE exists
             echo "checking if artifact exists"
-            if [ -d "${artifact_path}" ]; then
+            if [ -d "/home/ubuntu/artifacts/demo/build/web" ]; then
               echo "Artifact exists"
-              cp -r ${artifact_path} ${path}
+              cp -r /home/ubuntu/artifacts/demo/build/web ${path}/web
             else
               echo "Artifact does not exists.Nothing to copy"
             fi
