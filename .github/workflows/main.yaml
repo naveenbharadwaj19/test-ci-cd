@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: CI/CD
 
 on:
   push:
@@ -29,6 +29,7 @@ jobs:
             dart run build_runner build --delete-conflicting-outputs
             flutter build web --profile
           fi
+
       - name: Check for Build Errors
         id: build-status
         run: |
@@ -51,13 +52,25 @@ jobs:
               flutter build web --profile
             fi
           fi
+
       - name: Archive Build Artifacts
         if: steps.build-status.outcome == 'success'
         uses: actions/upload-artifact@v3
         with:
           name: web-artifact
           path: build/web
-          retention-days: 15 #will be expired in 15 days
+          retention-days: 15 # will be expired in 15 days
+
+      - name: Set Target Path
+        if: steps.build-status.outcome == 'success'
+        id: set-target
+        run: |
+          if [[ ${{ github.ref }} == "refs/heads/main" ]]; then
+            echo "::set-output name=target_path::$TARGET/main/demo"
+
+          else
+            echo "::set-output name=target_path::$TARGET/sandbox/demo"
+          fi
 
       - name: Deploy to EC2
         if: steps.build-status.outcome == 'success'
@@ -65,7 +78,7 @@ jobs:
         with:
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
           REMOTE_USER: ${{ secrets.REMOTE_USER }}
-          TARGET: /home/ubuntu/artifacts/demo
+          TARGET: ${{ steps.set-target.outputs.target_path }}
           SOURCE: build/
           SSH_PRIVATE_KEY: ${{ secrets.EC2_PEM_KEY }}
           SCRIPT_AFTER: |
@@ -73,11 +86,10 @@ jobs:
 
             path="/home/ubuntu/web"
 
-            artifact_path="/home/ubuntu/artifacts/demo/web"
+            artifact_path="${{ steps.set-target.outputs.target_path }}/web"
 
             echo "Deleting web/ folder"
             rm -rf ${path}/web
-            # echo "created ${path}/web"
 
             # Ensure that $GITHUB_WORKSPACE exists
             echo "checking if artifact exists"
@@ -86,5 +98,5 @@ jobs:
               cp -r ${artifact_path} ${path}/web
               echo "Transferred ${artifact_path} to ${path}/web"
             else
-              echo "Artifact does not exists.Nothing to copy"
+              echo "Artifact does not exist. Nothing to copy"
             fi
