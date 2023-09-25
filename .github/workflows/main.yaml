@@ -57,7 +57,7 @@ jobs:
         with:
           name: web-artifact
           path: build/web
-          expire_in: 15d #will be expired in 15 days
+          retention-days: 15 #will be expired in 15 days
 
       - name: Deploy to EC2
         if: steps.build-status.outcome == 'success'
