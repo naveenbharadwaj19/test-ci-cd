@@ -72,7 +72,7 @@ jobs:
 
             path="/home/ubuntu/web"
 
-            artifact_path="/home/ubuntu/artifacts/demo/build/web"
+            artifact_path="/home/ubuntu/artifacts/demo/web"
 
             echo "Deleting web/ folder"
             rm -rf ${path}/web
