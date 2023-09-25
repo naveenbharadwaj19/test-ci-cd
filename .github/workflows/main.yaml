@@ -72,18 +72,18 @@ jobs:
 
             path="/home/ubuntu/web"
 
-            artifact_path="/home/ubuntu/artifacts/demo"
+            artifact_path="/home/ubuntu/artifacts/demo/build/web"
 
-            echo "Deleting web/ folder"
-            rm -rf ${path}/web
-            mkdir ${path}/web
-            echo "${path}/web"
+            # echo "Deleting web/ folder"
+            # rm -rf ${path}/web
+            # mkdir ${path}/web
+            # echo "created ${path}/web"
 
             # Ensure that $GITHUB_WORKSPACE exists
             echo "checking if artifact exists"
-            if [ -d "/home/ubuntu/artifacts/demo/build/web" ]; then
+            if [ -d "${artifact_path}" ]; then
               echo "Artifact exists"
-              cp -r /home/ubuntu/artifacts/demo/build/web ${path}/web
+              cp -r ${artifact_path} ${path}/web
             else
               echo "Artifact does not exists.Nothing to copy"
             fi
