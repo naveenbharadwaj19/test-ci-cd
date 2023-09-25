@@ -74,8 +74,8 @@ jobs:
 
             artifact_path="/home/ubuntu/artifacts/demo/build/web"
 
-            # echo "Deleting web/ folder"
-            # rm -rf ${path}/web
+            echo "Deleting web/ folder"
+            rm -rf ${path}/web
             # mkdir ${path}/web
             # echo "created ${path}/web"
 
