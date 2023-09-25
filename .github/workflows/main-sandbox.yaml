@@ -1,4 +1,4 @@
-name: CI/CD-Main-Sandbox
+name: CI/CD-Sandbox
 
 on:
   push:
