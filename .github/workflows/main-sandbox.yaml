@@ -3,7 +3,7 @@ name: CI/CD-Sandbox
 on:
   push:
     branches:
-      - main-sandbox
+      - sandbox
 
 jobs:
   build-and-deploy:
