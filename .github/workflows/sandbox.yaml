@@ -78,6 +78,11 @@ jobs:
         with:
           publish-dir: '${{ github.workspace }}/build/web'
           deploy-message: "Deploy from GitHub Actions"
+          enable-pull-request-comment: false
+          enable-commit-comment: false
+          enable-commit-status: false
+          overwrites-pull-request-comment: false
+          alias: test-ci-cd-github
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
