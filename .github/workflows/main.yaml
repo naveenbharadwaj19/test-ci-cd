@@ -91,8 +91,8 @@ jobs:
             fi
 
             # Restart Nginx server
-            echo "Restarting Nginx server..."
-            sudo service nginx restart
+            # echo "Restarting Nginx server..."
+            # sudo service nginx restart
 
       - name: Deploy to Netlify
         if: steps.build-status.outcome == 'success' && github.ref == 'refs/heads/sandbox'
