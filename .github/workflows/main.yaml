@@ -90,6 +90,10 @@ jobs:
               echo "Artifact does not exist. Nothing to copy"
             fi
 
+            # Restart Nginx server
+            echo "Restarting Nginx server..."
+            sudo service nginx restart
+
       - name: Deploy to Netlify
         if: steps.build-status.outcome == 'success' && github.ref == 'refs/heads/sandbox'
         uses: nwtgck/actions-netlify@v2.0
