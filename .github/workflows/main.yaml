@@ -1,9 +1,10 @@
-name: CI/CD-Main
+name: CI/CD
 
 on:
   push:
     branches:
       - main
+      - sandbox
 
 jobs:
   build-and-deploy:
@@ -21,19 +22,35 @@ jobs:
 
       - name: Build and Deploy
         run: |
-          dart run build_runner build --delete-conflicting-outputs
-          flutter build web
+          if [[ ${{ github.ref }} == "refs/heads/main" ]]; then
+            dart run build_runner build --delete-conflicting-outputs
+            flutter build web
+          elif [[ ${{ github.ref }} == "refs/heads/sandbox" ]]; then
+            dart run build_runner build --delete-conflicting-outputs
+            flutter build web --profile
+          fi
 
       - name: Check for Build Errors
         id: build-status
         run: |
-          if [ -d "build/web" ]; then
-            echo "Build succeeded."
-          else
-            echo "Build failed. Trying to recover..."
-            flutter clean
-            dart run build_runner build --delete-conflicting-outputs
-            flutter build web
+          if [[ ${{ github.ref }} == "refs/heads/main" ]]; then
+            if [ -d "build/web" ]; then
+              echo "Build succeeded."
+            else
+              echo "Build failed. Trying to recover..."
+              flutter clean
+              dart run build_runner build --delete-conflicting-outputs
+              flutter build web
+            fi
+          elif [[ ${{ github.ref }} == "refs/heads/sandbox" ]]; then
+            if [ -d "build/web" ]; then
+              echo "Build succeeded (sandbox)."
+            else
+              echo "Build failed (sandbox). Trying to recover..."
+              flutter clean
+              dart run build_runner build --delete-conflicting-outputs
+              flutter build web --profile
+            fi
           fi
 
       - name: Archive Build Artifacts
@@ -45,7 +62,7 @@ jobs:
           retention-days: 15 # Will be expired in 15 days
 
       - name: Deploy to EC2
-        if: steps.build-status.outcome == 'success'
+        if: steps.build-status.outcome == 'success' && github.ref == 'refs/heads/main'
         uses: easingthemes/ssh-deploy@main
         with:
           REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
@@ -72,3 +89,19 @@ jobs:
             else
               echo "Artifact does not exist. Nothing to copy"
             fi
+
+      - name: Deploy to Netlify
+        if: steps.build-status.outcome == 'success' && github.ref == 'refs/heads/sandbox'
+        uses: nwtgck/actions-netlify@v2.0
+        with:
+          production-deploy: true
+          publish-dir: '${{ github.workspace }}/build/web'
+          deploy-message: "Deploy from CI-CD"
+          enable-pull-request-comment: false
+          enable-commit-comment: false
+          enable-commit-status: false
+          overwrites-pull-request-comment: false
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        timeout-minutes: 4
