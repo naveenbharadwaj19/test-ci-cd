@@ -44,46 +44,17 @@ jobs:
           path: build/web
           retention-days: 15 # Will be expired in 15 days
 
-      # - name: Deploy to EC2
-      #   if: steps.build-status.outcome == 'success'
-      #   uses: easingthemes/ssh-deploy@main
-      #   with:
-      #     REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
-      #     REMOTE_USER: ${{ secrets.REMOTE_USER }}
-      #     TARGET: ${{ secrets.TARGET }}/sandbox/demo
-      #     SOURCE: build/
-      #     SSH_PRIVATE_KEY: ${{ secrets.EC2_PEM_KEY }}
-      #     SCRIPT_AFTER: |
-      #       echo "Running script..."
-
-      #       path="/home/ubuntu/web"
-
-      #       artifact_path="${{ secrets.TARGET }}/sandbox/demo/web"
-
-      #       echo "Deleting web/ folder"
-      #       rm -rf ${path}/web
-
-      #       # Ensure that $GITHUB_WORKSPACE exists
-      #       echo "checking if artifact exists"
-      #       if [ -d "${artifact_path}" ]; then
-      #         echo "Artifact exists"
-      #         cp -r ${artifact_path} ${path}/web
-      #         echo "Transferred ${artifact_path} to ${path}/web"
-      #       else
-      #         echo "Artifact does not exist. Nothing to copy"
-      #       fi
-
       - name: Deploy to Netlify
         uses: nwtgck/actions-netlify@v2.0
         with:
           production-deploy: true
           publish-dir: '${{ github.workspace }}/build/web'
-          deploy-message: "Deploy from GitHub Actions"
+          deploy-message: "Deploy from CI-CD"
           enable-pull-request-comment: false
           enable-commit-comment: false
           enable-commit-status: false
           overwrites-pull-request-comment: false
-          # alias: test-ci-cd-github
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        timeout-minutes: 4
