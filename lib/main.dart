@@ -54,7 +54,7 @@ class _MyHomePageState extends State<MyHomePage> {
               foundation.kReleaseMode ? "PROD" : "SANDBOX",
             ),
             const Text(
-              'Hi You have pushed the button this many times:',
+              'You have pushed the button this many times.:',
             ),
             Text(
               '$_counter',
